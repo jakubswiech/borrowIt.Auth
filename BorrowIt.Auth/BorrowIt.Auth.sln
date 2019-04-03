@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BorrowIt.Auth", "BorrowIt.Auth\BorrowIt.Auth.csproj", "{66AE9844-5507-4C34-B2D0-A3E3482E67BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BorrowIt.Auth.Domain", "BorrowIt.Auth.Domain\BorrowIt.Auth.Domain.csproj", "{AE12C4D3-BAE8-4566-BBA4-6D726AD996D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{66AE9844-5507-4C34-B2D0-A3E3482E67BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66AE9844-5507-4C34-B2D0-A3E3482E67BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66AE9844-5507-4C34-B2D0-A3E3482E67BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE12C4D3-BAE8-4566-BBA4-6D726AD996D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE12C4D3-BAE8-4566-BBA4-6D726AD996D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE12C4D3-BAE8-4566-BBA4-6D726AD996D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE12C4D3-BAE8-4566-BBA4-6D726AD996D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
