@@ -29,6 +29,20 @@ namespace BorrowIt.Auth.Domain.Users
         {
             
         }
+
+
+        private void SetUserName(string userName)
+        {
+            UserName = userName;
+        }
+        private void SetFirstName(string firstName)
+        {
+            FirstName = firstName;
+        }
+        private void SetSecondName(string secondName)
+        {
+            SecondName = secondName;
+        }
     }
 
     public class Address
