@@ -5,7 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="BorrowIt.Common" Version="1.0.0" />
+      <PackageReference Include="BCrypt.Net-Core" Version="1.6.0" />
+      <PackageReference Include="BorrowIt.Common" Version="1.0.1" />
     </ItemGroup>
 
 </Project>

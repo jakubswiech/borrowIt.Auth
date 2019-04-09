@@ -1,6 +1,8 @@
-using System;
 using System.Collections.Generic;
+using BorrowIt.Auth.Domain.Users.Helpers;
+using BorrowIt.Auth.Domain.Users.Policies;
 using BorrowIt.Common.Domain;
+using BorrowIt.Common.Extensions;
 
 namespace BorrowIt.Auth.Domain.Users
 {
@@ -9,90 +11,48 @@ namespace BorrowIt.Auth.Domain.Users
 
         public string UserName { get; protected set; }
         public string Email { get; protected set; }
-        public string Password { get; protected set; }
+        public string PasswordHash { get; protected set; }
         public IEnumerable<Role> Roles { get; protected set; }
         public string FirstName { get; protected set; }
         public string SecondName { get; protected set; }
         
 
-        public User(IEnumerable<Role> roles, string password, string email, string userName, string firstName, string secondName)
+        public User(IEnumerable<Role> roles, string email, string userName, string firstName, string secondName)
         {
             Roles = roles;
-            Password = password;
-            Email = email;
-            UserName = userName;
-            FirstName = firstName;
-            SecondName = secondName;
+            SetUserName(userName);
+            SetFirstName(firstName);
+            SetSecondName(secondName);
         }
 
-        public void UpdateUser()
+        public void UpdateUser(IEnumerable<Role> roles, string email, string userName, string firstName, string secondName)
         {
-            
+            SetUserName(userName);
+            SetFirstName(firstName);
+            SetSecondName(secondName);
         }
 
 
         private void SetUserName(string userName)
         {
+            userName.ValidateNullOrEmptyString(nameof(userName));
             UserName = userName;
         }
         private void SetFirstName(string firstName)
         {
+            firstName.ValidateNullOrEmptyString(nameof(firstName));
             FirstName = firstName;
         }
         private void SetSecondName(string secondName)
         {
+            secondName.ValidateNullOrEmptyString(nameof(secondName));
             SecondName = secondName;
         }
-    }
 
-    public class Address
-    {
-        public Address(string postalCode, string street, string city)
+        public void SetPassword(string password)
         {
-            SetCity(city);
-            SetStreet(street);
-            SetPostalCode(postalCode);
-        }
-
-        public string City { get; private set; }
-        public string Street { get; private set; }
-        public string PostalCode { get; private set; }
-
-        public void UpdateAddress(string city, string street, string postalCode)
-        {
-            SetCity(city);
-            SetStreet(street);
-            SetPostalCode(postalCode);
-        }
-
-        private void SetCity(string city)
-        {
-            if (string.IsNullOrWhiteSpace(city))
-            {
-                throw new ArgumentNullException(nameof(city));
-            }
-
-            City = city;
-        }
-        
-        private void SetStreet(string street)
-        {
-            if (string.IsNullOrWhiteSpace(street))
-            {
-                throw new ArgumentNullException(nameof(street));
-            }
-
-            Street = street;
-        }
-        
-        private void SetPostalCode(string postalCode)
-        {
-            if (string.IsNullOrWhiteSpace(postalCode))
-            {
-                throw new ArgumentNullException(nameof(postalCode));
-            }
-
-            PostalCode = postalCode;
+            password.Validate<MinimalEightLettersPasswordPolicy>();
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
         }
     }
 }
