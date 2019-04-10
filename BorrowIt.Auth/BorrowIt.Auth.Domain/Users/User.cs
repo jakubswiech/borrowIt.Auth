@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BorrowIt.Auth.Domain.Users.Helpers;
 using BorrowIt.Auth.Domain.Users.Policies;
@@ -15,14 +16,20 @@ namespace BorrowIt.Auth.Domain.Users
         public IEnumerable<Role> Roles { get; protected set; }
         public string FirstName { get; protected set; }
         public string SecondName { get; protected set; }
+        public DateTime CreateDate { get; }
+        public DateTime BirthDate { get; protected set; }
+        public DateTime? ModifyDate { get; protected set; }
         
 
-        public User(IEnumerable<Role> roles, string email, string userName, string firstName, string secondName)
+        public User(IEnumerable<Role> roles, string email, string userName, string firstName, string secondName, DateTime birthDate)
         {
-            Roles = roles;
+            SetBirthDate(birthDate);
             SetUserName(userName);
             SetFirstName(firstName);
             SetSecondName(secondName);
+            Roles = roles;
+            CreateDate = DateTime.UtcNow;
+            ModifyDate = null;
         }
 
         public void UpdateUser(IEnumerable<Role> roles, string email, string userName, string firstName, string secondName)
@@ -54,5 +61,15 @@ namespace BorrowIt.Auth.Domain.Users
             password.Validate<MinimalEightLettersPasswordPolicy>();
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
         }
+        private void SetBirthDate(DateTime birthDate)
+        {
+            if (birthDate > DateTime.UtcNow)
+            {
+                throw new Exception();
+            }
+
+            BirthDate = birthDate;
+        }
+
     }
 }
