@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BorrowIt.Auth.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BorrowIt.Auth.Infrastructure.Abstraction", "BorrowIt.Auth.Infrastructure.Abstraction\BorrowIt.Auth.Infrastructure.Abstraction.csproj", "{8996CE03-F64F-4CDA-9EE9-4E2BB93C034A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BorrowIt.Auth.Application", "BorrowIt.Auth.Application\BorrowIt.Auth.Application.csproj", "{C66E11FD-645E-4F57-B9B8-A31538F35686}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{8996CE03-F64F-4CDA-9EE9-4E2BB93C034A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8996CE03-F64F-4CDA-9EE9-4E2BB93C034A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8996CE03-F64F-4CDA-9EE9-4E2BB93C034A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C66E11FD-645E-4F57-B9B8-A31538F35686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C66E11FD-645E-4F57-B9B8-A31538F35686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C66E11FD-645E-4F57-B9B8-A31538F35686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C66E11FD-645E-4F57-B9B8-A31538F35686}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

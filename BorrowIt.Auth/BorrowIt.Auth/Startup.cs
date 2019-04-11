@@ -7,7 +7,11 @@ using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
+using BorrowIt.Auth.Application.Services;
+using BorrowIt.Auth.Infrastructure.Repositories.Users;
+using BorrowIt.Common.Infrastructure.IoC;
 using BorrowIt.Common.Mongo.IoC;
+using BorrowIt.Common.Mongo.Repositories;
 using BorrowIt.Common.Rabbit.IoC;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,6 +44,9 @@ namespace BorrowIt.Auth
             builder.RegisterModule(new MongoDbModule(Configuration, "mongoDb"));
             builder.RegisterAssemblyTypes(Assembly.GetEntryAssembly())
                 .AsImplementedInterfaces();
+            builder.AddRepositories<IUsersRepository>()
+                .AddGenericRepository(typeof(GenericMongoRepository<,>));
+            builder.AddServices<IUsersService>();
             builder.Populate(services);
             Container = builder.Build();
 

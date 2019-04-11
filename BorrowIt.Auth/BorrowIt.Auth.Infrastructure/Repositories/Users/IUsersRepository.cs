@@ -4,7 +4,7 @@ using BorrowIt.Common.Domain.Repositories;
 
 namespace BorrowIt.Auth.Infrastructure.Repositories.Users
 {
-    public interface IUsersRepository : IGenericRepository<User, UserEntity>
+    public interface IUsersRepository : IGenericRepository<User, UserEntity>, IRepository
     {
         
     }

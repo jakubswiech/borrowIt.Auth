@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using BorrowIt.Auth.Domain.Users.Helpers;
 using BorrowIt.Auth.Domain.Users.Policies;
 using BorrowIt.Common.Domain;
@@ -21,19 +22,22 @@ namespace BorrowIt.Auth.Domain.Users
         public DateTime? ModifyDate { get; protected set; }
         
 
-        public User(IEnumerable<Role> roles, string email, string userName, string firstName, string secondName, DateTime birthDate)
+        public User(Guid id, IEnumerable<Role> roles, string email, string userName, string firstName, string secondName, DateTime birthDate)
         {
+            Id = id;
             SetBirthDate(birthDate);
             SetUserName(userName);
             SetFirstName(firstName);
             SetSecondName(secondName);
+            SetEmail(email);
             Roles = roles;
             CreateDate = DateTime.UtcNow;
             ModifyDate = null;
         }
 
-        public void UpdateUser(IEnumerable<Role> roles, string email, string userName, string firstName, string secondName)
+        public void UpdateUser(string email, string userName, string firstName, string secondName, DateTime birthDate)
         {
+            SetBirthDate(birthDate);
             SetUserName(userName);
             SetFirstName(firstName);
             SetSecondName(secondName);
@@ -69,6 +73,13 @@ namespace BorrowIt.Auth.Domain.Users
             }
 
             BirthDate = birthDate;
+        }
+        
+        private void SetEmail(string email)
+        {
+            email.Validate<EmailPolicy>();
+
+            Email = email;
         }
 
     }

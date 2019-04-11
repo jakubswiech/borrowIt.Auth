@@ -5,11 +5,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="BorrowIt.Common.Mongo" Version="1.0.2" />
+      <Folder Include="Commands" />
+      <Folder Include="Handlers" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BorrowIt.Common" Version="1.0.2" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\BorrowIt.Auth.Domain\BorrowIt.Auth.Domain.csproj" />
+      <ProjectReference Include="..\BorrowIt.Auth.Infrastructure\BorrowIt.Auth.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
