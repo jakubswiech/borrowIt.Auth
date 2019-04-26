@@ -7,8 +7,13 @@ using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
+using BorrowIt.Auth.Application.Commands;
 using BorrowIt.Auth.Application.Services;
+using BorrowIt.Auth.Domain.Users.Factories;
+using BorrowIt.Auth.Infrastructure.Mappings.Users;
 using BorrowIt.Auth.Infrastructure.Repositories.Users;
+using BorrowIt.Common.Infrastructure.Abstraction;
+using BorrowIt.Common.Infrastructure.Implementations;
 using BorrowIt.Common.Infrastructure.IoC;
 using BorrowIt.Common.Mongo.IoC;
 using BorrowIt.Common.Mongo.Repositories;
@@ -21,6 +26,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace BorrowIt.Auth
 {
@@ -38,6 +44,7 @@ namespace BorrowIt.Auth
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddSwaggerGen(ctx => ctx.SwaggerDoc("v1", new Info() { Title = "BorrowIt.Auth", Version = "v1" }));
             
             var builder = new ContainerBuilder();
             builder.RegisterModule(new RawRabbitModule(Configuration));
@@ -47,7 +54,21 @@ namespace BorrowIt.Auth
             builder.AddRepositories<IUsersRepository>()
                 .AddGenericRepository(typeof(GenericMongoRepository<,>));
             builder.AddServices<IUsersService>();
+            builder.RegisterAssemblyTypes(typeof(CreateUserCommand).Assembly)
+                .AsClosedTypesOf(typeof(ICommandHandler<>));
+            builder.RegisterType<CommandDispatcher>().As<ICommandDispatcher>().InstancePerLifetimeScope();
+            builder.Register(ctx =>
+            {
+                var assemblies = new List<Assembly> {typeof(UsersMappingProfile).Assembly, typeof(CreateUserCommand).Assembly};
+                
+                var mapperConfig = new MapperConfiguration(x =>
+                    x.AddProfiles(assemblies));
+
+                return mapperConfig.CreateMapper();
+            }).As<IMapper>().InstancePerLifetimeScope();
             builder.Populate(services);
+            builder.RegisterAssemblyTypes(typeof(IUserFactory).Assembly).Where(x => x.Name.EndsWith("Factory"))
+                .AsImplementedInterfaces();
             Container = builder.Build();
 
             return new AutofacServiceProvider(Container);
@@ -60,6 +81,11 @@ namespace BorrowIt.Auth
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                });
             }
             else
             {

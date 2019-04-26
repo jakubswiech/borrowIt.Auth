@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using BorrowIt.Auth.Domain.Users;
+using BorrowIt.Common.Infrastructure.Abstraction.Commands;
 
-namespace BorrowIt.Auth.Domain.Users.DataStructure
+namespace BorrowIt.Auth.Application.Commands
 {
-    public class UserDataStructure
+    public class CreateUserCommand : ICommand
     {
         public Guid? Id { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
-        public IEnumerable<Role> Roles { get; set; }
         public string FirstName { get; set; }
         public string SecondName { get; set; }
         public DateTime BirthDate { get; set; }

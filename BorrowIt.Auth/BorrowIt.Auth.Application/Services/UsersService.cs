@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using BorrowIt.Auth.Domain.Users;
 using BorrowIt.Auth.Domain.Users.DataStructure;
+using BorrowIt.Auth.Domain.Users.Events;
 using BorrowIt.Auth.Domain.Users.Factories;
 using BorrowIt.Auth.Infrastructure.Repositories.Users;
 using BorrowIt.Common.Exceptions;
+using BorrowIt.Common.Rabbit.Abstractions;
 
 namespace BorrowIt.Auth.Application.Services
 {
@@ -14,11 +16,13 @@ namespace BorrowIt.Auth.Application.Services
     {
         private readonly IUsersRepository _usersRepository;
         private readonly IUserFactory _userFactory;
+        private readonly IBusPublisher _busPublisher;
 
-        public UsersService(IUsersRepository usersRepository, IUserFactory userFactory)
+        public UsersService(IUsersRepository usersRepository, IUserFactory userFactory, IBusPublisher busPublisher)
         {
             _usersRepository = usersRepository;
             _userFactory = userFactory;
+            _busPublisher = busPublisher;
         }
         
         public async Task AddUserAsync(UserDataStructure userDataStructure)
@@ -33,8 +37,21 @@ namespace BorrowIt.Auth.Application.Services
             }
 
             var user = _userFactory.CreateUser(userDataStructure);
+            ValidatePasswords(userDataStructure.Password, userDataStructure.ConfirmPassword);
+            user.SetPassword(userDataStructure.Password);
 
             await _usersRepository.CreateAsync(user);
+
+            var userCratedEvent = new UserCreatedEvent(user.Id, user.UserName, user.Email,
+                user.Roles?.Select(x => x.Name), user.FirstName, user.SecondName, user.BirthDate, user.ModifyDate,
+                new AddressEventData()
+                {
+                    City = user.Address.City,
+                    PostalCode = user.Address.City,
+                    Street = user.Address.Street
+                });
+
+            await _busPublisher.PublishAsync(userCratedEvent);
         }
 
         public async Task UpdateUserAsync(UserDataStructure userDataStructure)
@@ -50,7 +67,7 @@ namespace BorrowIt.Auth.Application.Services
                 userDataStructure.UserName,
                 userDataStructure.FirstName,
                 userDataStructure.SecondName,
-                userDataStructure.BirthDate);
+                userDataStructure.BirthDate, userDataStructure.Roles, new Address(userDataStructure.PostalCode, userDataStructure.Street, userDataStructure.City));
 
             await _usersRepository.UpdateAsync(user);
         }

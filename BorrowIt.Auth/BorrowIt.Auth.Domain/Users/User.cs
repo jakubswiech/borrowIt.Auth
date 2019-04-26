@@ -20,9 +20,10 @@ namespace BorrowIt.Auth.Domain.Users
         public DateTime CreateDate { get; }
         public DateTime BirthDate { get; protected set; }
         public DateTime? ModifyDate { get; protected set; }
+        public Address Address { get; protected set; }
         
 
-        public User(Guid id, IEnumerable<Role> roles, string email, string userName, string firstName, string secondName, DateTime birthDate)
+        public User(Guid id, IEnumerable<Role> roles, string email, string userName, string firstName, string secondName, DateTime birthDate, Address address)
         {
             Id = id;
             SetBirthDate(birthDate);
@@ -31,16 +32,20 @@ namespace BorrowIt.Auth.Domain.Users
             SetSecondName(secondName);
             SetEmail(email);
             Roles = roles;
+            Address = address;
             CreateDate = DateTime.UtcNow;
             ModifyDate = null;
         }
 
-        public void UpdateUser(string email, string userName, string firstName, string secondName, DateTime birthDate)
+        public void UpdateUser(string email, string userName, string firstName, string secondName, DateTime birthDate, IEnumerable<Role> roles, Address address)
         {
             SetBirthDate(birthDate);
             SetUserName(userName);
             SetFirstName(firstName);
             SetSecondName(secondName);
+            Roles = roles;
+            Address = address;
+            ModifyDate = DateTime.UtcNow;
         }
 
 

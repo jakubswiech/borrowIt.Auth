@@ -17,7 +17,8 @@ namespace BorrowIt.Auth.Domain.Users.Factories
                 ,userDataStructure.UserName
                 ,userDataStructure.FirstName
                 ,userDataStructure.SecondName
-                ,userDataStructure.BirthDate);
+                ,userDataStructure.BirthDate
+                ,new Address(userDataStructure.PostalCode, userDataStructure.Street, userDataStructure.City));
 
             return user;
         }

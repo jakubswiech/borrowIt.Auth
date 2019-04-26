@@ -5,12 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Commands" />
-      <Folder Include="Handlers" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="BorrowIt.Common" Version="1.0.2" />
+      <PackageReference Include="BorrowIt.Common" Version="1.0.3" />
     </ItemGroup>
 
     <ItemGroup>
