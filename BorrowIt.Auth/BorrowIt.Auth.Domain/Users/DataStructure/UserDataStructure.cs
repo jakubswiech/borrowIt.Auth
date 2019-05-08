@@ -8,7 +8,7 @@ namespace BorrowIt.Auth.Domain.Users.DataStructure
         public Guid? Id { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
-        public IEnumerable<Role> Roles { get; set; }
+        public IEnumerable<Guid> Roles { get; set; }
         public string FirstName { get; set; }
         public string SecondName { get; set; }
         public DateTime BirthDate { get; set; }

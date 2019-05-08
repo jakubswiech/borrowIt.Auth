@@ -14,5 +14,6 @@ namespace BorrowIt.Auth.Application.Services
         Task RemoveUserAsync(Guid id);
         Task SetPasswordAsync(string userName, string password, string confirmPassword);
         Task ChangePasswordAsync(string userName, string oldPassword, string newPassword, string confirmPassword);
+        Task<string> SignInAsync(UserDataStructure userDataStructure);
     }
 }

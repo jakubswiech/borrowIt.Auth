@@ -14,7 +14,7 @@ namespace BorrowIt.Auth.Domain.Users
         public string UserName { get; protected set; }
         public string Email { get; protected set; }
         public string PasswordHash { get; protected set; }
-        public IEnumerable<Role> Roles { get; protected set; }
+        public IEnumerable<Guid> Roles { get; protected set; }
         public string FirstName { get; protected set; }
         public string SecondName { get; protected set; }
         public DateTime CreateDate { get; }
@@ -23,7 +23,7 @@ namespace BorrowIt.Auth.Domain.Users
         public Address Address { get; protected set; }
         
 
-        public User(Guid id, IEnumerable<Role> roles, string email, string userName, string firstName, string secondName, DateTime birthDate, Address address)
+        public User(Guid id, IEnumerable<Guid> roles, string email, string userName, string firstName, string secondName, DateTime birthDate, Address address)
         {
             Id = id;
             SetBirthDate(birthDate);
@@ -37,7 +37,7 @@ namespace BorrowIt.Auth.Domain.Users
             ModifyDate = null;
         }
 
-        public void UpdateUser(string email, string userName, string firstName, string secondName, DateTime birthDate, IEnumerable<Role> roles, Address address)
+        public void UpdateUser(string email, string userName, string firstName, string secondName, DateTime birthDate, IEnumerable<Guid> roles, Address address)
         {
             SetBirthDate(birthDate);
             SetUserName(userName);
@@ -46,6 +46,11 @@ namespace BorrowIt.Auth.Domain.Users
             Roles = roles;
             Address = address;
             ModifyDate = DateTime.UtcNow;
+        }
+        
+        private User()
+        {
+            
         }
 
 

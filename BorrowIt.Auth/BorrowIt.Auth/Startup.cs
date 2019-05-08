@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using BorrowIt.Auth.Application.Commands;
+using BorrowIt.Auth.Application.Queries;
 using BorrowIt.Auth.Application.Services;
 using BorrowIt.Auth.Domain.Users.Factories;
 using BorrowIt.Auth.Infrastructure.Mappings.Users;
@@ -18,6 +20,7 @@ using BorrowIt.Common.Infrastructure.IoC;
 using BorrowIt.Common.Mongo.IoC;
 using BorrowIt.Common.Mongo.Repositories;
 using BorrowIt.Common.Rabbit.IoC;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,6 +29,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace BorrowIt.Auth
@@ -44,7 +48,38 @@ namespace BorrowIt.Auth
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSwaggerGen(ctx => ctx.SwaggerDoc("v1", new Info() { Title = "BorrowIt.Auth", Version = "v1" }));
+            services.AddCors();
+            services.AddSwaggerGen(ctx =>
+            {
+                ctx.SwaggerDoc("v1", new Info() {Title = "BorrowIt.Auth", Version = "v1"});
+                
+                ctx.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Name = "Authorization",
+                    In = "header",
+                    Type = "apiKey"
+                });
+            });
+            var secret = Configuration["Secret"];
+            var key = Encoding.ASCII.GetBytes(Configuration["Secret"]);
+            services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
             
             var builder = new ContainerBuilder();
             builder.RegisterModule(new RawRabbitModule(Configuration));
@@ -66,6 +101,9 @@ namespace BorrowIt.Auth
 
                 return mapperConfig.CreateMapper();
             }).As<IMapper>().InstancePerLifetimeScope();
+            builder.RegisterType<QueryDispatcher>().As<IQueryDispatcher>().InstancePerLifetimeScope();
+            builder.RegisterAssemblyTypes(typeof(SignInQuery).Assembly)
+                .AsClosedTypesOf(typeof(IQueryHandler<,>));
             builder.Populate(services);
             builder.RegisterAssemblyTypes(typeof(IUserFactory).Assembly).Where(x => x.Name.EndsWith("Factory"))
                 .AsImplementedInterfaces();
@@ -78,6 +116,12 @@ namespace BorrowIt.Auth
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseCors(c =>
+            {
+                c.AllowAnyHeader();
+                c.AllowAnyMethod();
+                c.AllowAnyOrigin();
+            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -94,6 +138,7 @@ namespace BorrowIt.Auth
             }
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseMvc();
         }
     }

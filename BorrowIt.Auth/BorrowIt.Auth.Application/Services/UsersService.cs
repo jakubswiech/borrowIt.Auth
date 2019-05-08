@@ -1,5 +1,8 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using BorrowIt.Auth.Domain.Users;
@@ -9,6 +12,8 @@ using BorrowIt.Auth.Domain.Users.Factories;
 using BorrowIt.Auth.Infrastructure.Repositories.Users;
 using BorrowIt.Common.Exceptions;
 using BorrowIt.Common.Rabbit.Abstractions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BorrowIt.Auth.Application.Services
 {
@@ -17,12 +22,14 @@ namespace BorrowIt.Auth.Application.Services
         private readonly IUsersRepository _usersRepository;
         private readonly IUserFactory _userFactory;
         private readonly IBusPublisher _busPublisher;
+        private readonly IConfiguration _configuration;
 
-        public UsersService(IUsersRepository usersRepository, IUserFactory userFactory, IBusPublisher busPublisher)
+        public UsersService(IUsersRepository usersRepository, IUserFactory userFactory, IBusPublisher busPublisher, IConfiguration configuration)
         {
             _usersRepository = usersRepository;
             _userFactory = userFactory;
             _busPublisher = busPublisher;
+            _configuration = configuration;
         }
         
         public async Task AddUserAsync(UserDataStructure userDataStructure)
@@ -43,7 +50,7 @@ namespace BorrowIt.Auth.Application.Services
             await _usersRepository.CreateAsync(user);
 
             var userCratedEvent = new UserCreatedEvent(user.Id, user.UserName, user.Email,
-                user.Roles?.Select(x => x.Name), user.FirstName, user.SecondName, user.BirthDate, user.ModifyDate,
+                user.Roles.Select(x => x.ToString()), user.FirstName, user.SecondName, user.BirthDate, user.ModifyDate,
                 new AddressEventData()
                 {
                     City = user.Address.City,
@@ -102,6 +109,18 @@ namespace BorrowIt.Auth.Application.Services
             await _usersRepository.UpdateAsync(user);
         }
 
+        public async Task<string> SignInAsync(UserDataStructure userDataStructure)
+        {
+            var user = await GetOneOrThrowAsync(userDataStructure.UserName);
+
+            if (!BCrypt.Net.BCrypt.Verify(userDataStructure.Password, user.PasswordHash))
+            {
+                throw new BusinessLogicException("Invalid credentials.");
+            }
+
+            return GenerateToken(user);
+        }
+
         private async Task<User> GetOneOrThrowAsync(Guid id)
         {
             var user = await _usersRepository.GetAsync(id);
@@ -111,6 +130,24 @@ namespace BorrowIt.Auth.Application.Services
             }
 
             return user;
+        }
+
+        private string GenerateToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Secret"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[] 
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return tokenHandler.WriteToken(token);
         }
 
         private async Task<User> GetOneOrThrowAsync(string userName)
