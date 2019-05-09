@@ -11,7 +11,7 @@ namespace BorrowIt.Auth.Application.Handlers.Queries
     {
         private readonly IUsersService _usersService;
 
-        public UserSignInQuery(IUsersService usersService)
+        public UserSignInQueryHandler(IUsersService usersService)
         {
             _usersService = usersService;
         }

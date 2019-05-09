@@ -51,6 +51,12 @@ namespace BorrowIt.Auth
             services.AddCors();
             services.AddSwaggerGen(ctx =>
             {
+                
+                var security = new Dictionary<string, IEnumerable<string>>
+                {
+                    {"Bearer", new string[] { }},
+                };
+
                 ctx.SwaggerDoc("v1", new Info() {Title = "BorrowIt.Auth", Version = "v1"});
                 
                 ctx.AddSecurityDefinition("Bearer", new ApiKeyScheme
@@ -60,8 +66,9 @@ namespace BorrowIt.Auth
                     In = "header",
                     Type = "apiKey"
                 });
+                
+                ctx.AddSecurityRequirement(security);
             });
-            var secret = Configuration["Secret"];
             var key = Encoding.ASCII.GetBytes(Configuration["Secret"]);
             services.AddAuthentication(x =>
                 {

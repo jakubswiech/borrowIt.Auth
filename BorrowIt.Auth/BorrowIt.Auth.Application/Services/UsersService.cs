@@ -34,16 +34,14 @@ namespace BorrowIt.Auth.Application.Services
         
         public async Task AddUserAsync(UserDataStructure userDataStructure)
         {
-            try
-            {
-                await GetOneOrThrowAsync(userDataStructure.UserName);
-            }
-            catch (BusinessLogicException ex)
-            {
-                
-            }
+            var user = (await _usersRepository.GetWithExpressionAsync(x => x.UserName == userDataStructure.UserName)).SingleOrDefault();
 
-            var user = _userFactory.CreateUser(userDataStructure);
+            if (user != null)
+            {
+                throw new BusinessLogicException("User already exists");
+            }
+            
+            user = _userFactory.CreateUser(userDataStructure);
             ValidatePasswords(userDataStructure.Password, userDataStructure.ConfirmPassword);
             user.SetPassword(userDataStructure.Password);
 

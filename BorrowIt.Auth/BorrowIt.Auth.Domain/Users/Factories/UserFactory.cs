@@ -12,7 +12,7 @@ namespace BorrowIt.Auth.Domain.Users.Factories
             
             var user = new User(
                 GetOrCreateId(userDataStructure.Id)
-                ,userDataStructure.Roles
+                ,userDataStructure.Roles ?? new List<Guid>()
                 ,userDataStructure.Email
                 ,userDataStructure.UserName
                 ,userDataStructure.FirstName

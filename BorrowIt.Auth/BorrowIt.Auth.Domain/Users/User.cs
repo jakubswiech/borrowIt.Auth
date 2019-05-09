@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using BorrowIt.Auth.Domain.Users.Helpers;
 using BorrowIt.Auth.Domain.Users.Policies;
@@ -31,7 +32,7 @@ namespace BorrowIt.Auth.Domain.Users
             SetFirstName(firstName);
             SetSecondName(secondName);
             SetEmail(email);
-            Roles = roles;
+            Roles = roles.ToList();
             Address = address;
             CreateDate = DateTime.UtcNow;
             ModifyDate = null;
