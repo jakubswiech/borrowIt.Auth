@@ -47,7 +47,7 @@ namespace BorrowIt.Auth.Application.Services
 
             await _usersRepository.CreateAsync(user);
 
-            var userCratedEvent = new UserCreatedEvent(user.Id, user.UserName, user.Email,
+            var userCratedEvent = new UserChangedEvent(user.Id, user.UserName, user.Email,
                 user.Roles.Select(x => x.ToString()), user.FirstName, user.SecondName, user.BirthDate, user.ModifyDate,
                 new AddressEventData()
                 {
@@ -75,6 +75,17 @@ namespace BorrowIt.Auth.Application.Services
                 userDataStructure.BirthDate, userDataStructure.Roles, new Address(userDataStructure.PostalCode, userDataStructure.Street, userDataStructure.City));
 
             await _usersRepository.UpdateAsync(user);
+            
+            var userCratedEvent = new UserChangedEvent(user.Id, user.UserName, user.Email,
+                user.Roles.Select(x => x.ToString()), user.FirstName, user.SecondName, user.BirthDate, user.ModifyDate,
+                new AddressEventData()
+                {
+                    City = user.Address.City,
+                    PostalCode = user.Address.City,
+                    Street = user.Address.Street
+                });
+
+            await _busPublisher.PublishAsync(userCratedEvent);
         }
 
         public async Task RemoveUserAsync(Guid id)

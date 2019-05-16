@@ -6,9 +6,9 @@ using BorrowIt.Common.Rabbit.Attributes;
 namespace BorrowIt.Auth.Domain.Users.Events
 {
     [RabbitMessage("Auth")]
-    public class UserCreatedEvent : IMessage
+    public class UserChangedEvent : IMessage
     {
-        public UserCreatedEvent(Guid id, string userName, string email, IEnumerable<string> roles, string firstName, string secondName, DateTime birthDate, DateTime? modifyDate, AddressEventData address)
+        public UserChangedEvent(Guid id, string userName, string email, IEnumerable<string> roles, string firstName, string secondName, DateTime birthDate, DateTime? modifyDate, AddressEventData address)
         {
             Id = id;
             UserName = userName;
