@@ -138,7 +138,6 @@ namespace BorrowIt.Auth
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseMvc();
         }
