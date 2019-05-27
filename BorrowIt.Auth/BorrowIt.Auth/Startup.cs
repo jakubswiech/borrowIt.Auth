@@ -11,6 +11,7 @@ using BorrowIt.Auth.Application.Services;
 using BorrowIt.Auth.Domain.Users.Factories;
 using BorrowIt.Auth.Infrastructure.Mappings.Users;
 using BorrowIt.Auth.Infrastructure.Repositories.Users;
+using BorrowIt.Common.Extensions;
 using BorrowIt.Common.Infrastructure.Abstraction;
 using BorrowIt.Common.Infrastructure.Implementations;
 using BorrowIt.Common.Infrastructure.IoC;
@@ -90,6 +91,7 @@ namespace BorrowIt.Auth
             builder.AddRepositories<IUsersRepository>()
                 .AddGenericRepository(typeof(GenericMongoRepository<,>));
             builder.AddServices<IUsersService>();
+            builder.AddSerilog();
             builder.RegisterAssemblyTypes(typeof(CreateUserCommand).Assembly)
                 .AsClosedTypesOf(typeof(ICommandHandler<>));
             builder.RegisterType<CommandDispatcher>().As<ICommandDispatcher>().InstancePerLifetimeScope();
@@ -123,9 +125,9 @@ namespace BorrowIt.Auth
                 c.AllowAnyMethod();
                 c.AllowAnyOrigin();
             });
+            app.UseApiExceptionMiddleware();
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {

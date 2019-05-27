@@ -18,7 +18,7 @@ namespace BorrowIt.Auth.Application.Handlers.Queries
         public async Task<UserSignedInDto> HandleAsync(SignInQuery query)
         {
             var dataStructure = new UserDataStructure() {UserName = query.UserName, Password = query.Password};
-            var userDto = new UserSignedInDto() {Token = await _usersService.SignInAsync(dataStructure)};
+            var userDto = await _usersService.SignInAsync(dataStructure);
 
             return userDto;
         }

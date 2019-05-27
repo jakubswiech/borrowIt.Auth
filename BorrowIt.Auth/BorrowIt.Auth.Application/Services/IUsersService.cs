@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using BorrowIt.Auth.Application.DTOs;
 using BorrowIt.Auth.Domain.Users;
 using BorrowIt.Auth.Domain.Users.DataStructure;
 using BorrowIt.Common.Application.Services;
@@ -14,6 +15,6 @@ namespace BorrowIt.Auth.Application.Services
         Task RemoveUserAsync(Guid id);
         Task SetPasswordAsync(string userName, string password, string confirmPassword);
         Task ChangePasswordAsync(string userName, string oldPassword, string newPassword, string confirmPassword);
-        Task<string> SignInAsync(UserDataStructure userDataStructure);
+        Task<UserSignedInDto> SignInAsync(UserDataStructure userDataStructure);
     }
 }

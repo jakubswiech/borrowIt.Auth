@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using BorrowIt.Auth.Application.DTOs;
 using BorrowIt.Auth.Domain.Users;
 using BorrowIt.Auth.Domain.Users.DataStructure;
 using BorrowIt.Auth.Domain.Users.Events;
@@ -118,7 +119,7 @@ namespace BorrowIt.Auth.Application.Services
             await _usersRepository.UpdateAsync(user);
         }
 
-        public async Task<string> SignInAsync(UserDataStructure userDataStructure)
+        public async Task<UserSignedInDto> SignInAsync(UserDataStructure userDataStructure)
         {
             var user = await GetOneOrThrowAsync(userDataStructure.UserName);
 
@@ -127,7 +128,13 @@ namespace BorrowIt.Auth.Application.Services
                 throw new BusinessLogicException("Invalid credentials.");
             }
 
-            return GenerateToken(user);
+            return new UserSignedInDto()
+            {
+                Token = GenerateToken(user),
+                Email = user.Email,
+                Id = user.Id.ToString(),
+                UserName = user.UserName
+            };
         }
 
         private async Task<User> GetOneOrThrowAsync(Guid id)
