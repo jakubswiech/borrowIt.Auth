@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using BorrowIt.Auth.Application.Commands;
@@ -39,7 +40,10 @@ namespace BorrowIt.Auth.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return Ok("bangla");
+            var query = new GetUserQuery() {Id = new Guid(User.Identity.Name)};
+            var user = await QueryDispatcher.DispatchQueryAsync<UserDto, GetUserQuery>(query);
+
+            return Ok(user);
         }
     }
 }
