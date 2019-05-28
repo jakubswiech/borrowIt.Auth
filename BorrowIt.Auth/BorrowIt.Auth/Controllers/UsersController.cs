@@ -40,10 +40,24 @@ namespace BorrowIt.Auth.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var query = new GetUserQuery() {Id = new Guid(User.Identity.Name)};
+            var query = new GetUserQuery() {Id = GetCurrentUserId()};
             var user = await QueryDispatcher.DispatchQueryAsync<UserDto, GetUserQuery>(query);
 
             return Ok(user);
+        }
+
+        [Authorize]
+        [HttpDelete]
+        public async Task<IActionResult> Delete()
+        {
+            var command = new DeleteUserCommand() {Id = GetCurrentUserId()};
+            await CommandDispatcher.DispatchAsync(command);
+            return Ok();
+        }
+
+        private Guid GetCurrentUserId()
+        {
+            return new Guid(User.Identity.Name);
         }
     }
 }

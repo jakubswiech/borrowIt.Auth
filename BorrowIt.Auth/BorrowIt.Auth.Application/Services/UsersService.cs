@@ -93,6 +93,8 @@ namespace BorrowIt.Auth.Application.Services
         {
             var user = await GetOneOrThrowAsync(id);
             await _usersRepository.RemoveAsync(user);
+
+            await _busPublisher.PublishAsync(new UserRemovedEvent(id));
         }
 
         public async Task SetPasswordAsync(string userName, string password, string confirmPassword)
