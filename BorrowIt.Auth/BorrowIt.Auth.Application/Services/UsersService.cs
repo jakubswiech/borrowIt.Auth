@@ -70,10 +70,9 @@ namespace BorrowIt.Auth.Application.Services
             var user = await GetOneOrThrowAsync(userDataStructure.Id.Value);
             
             user.UpdateUser(userDataStructure.Email,
-                userDataStructure.UserName,
                 userDataStructure.FirstName,
                 userDataStructure.SecondName,
-                userDataStructure.BirthDate, userDataStructure.Roles, new Address(userDataStructure.PostalCode, userDataStructure.Street, userDataStructure.City));
+                userDataStructure.BirthDate, new Address(userDataStructure.PostalCode, userDataStructure.Street, userDataStructure.City));
 
             await _usersRepository.UpdateAsync(user);
             

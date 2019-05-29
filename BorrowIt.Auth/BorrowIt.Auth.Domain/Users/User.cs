@@ -38,13 +38,12 @@ namespace BorrowIt.Auth.Domain.Users
             ModifyDate = null;
         }
 
-        public void UpdateUser(string email, string userName, string firstName, string secondName, DateTime birthDate, IEnumerable<Guid> roles, Address address)
+        public void UpdateUser(string email, string firstName, string secondName, DateTime birthDate, Address address)
         {
             SetBirthDate(birthDate);
-            SetUserName(userName);
+            SetEmail(email);
             SetFirstName(firstName);
             SetSecondName(secondName);
-            Roles = roles;
             Address = address;
             ModifyDate = DateTime.UtcNow;
         }

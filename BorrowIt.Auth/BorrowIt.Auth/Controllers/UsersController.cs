@@ -55,6 +55,16 @@ namespace BorrowIt.Auth.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [HttpPut]
+        public async Task<IActionResult> Put([FromBody] UpdateUserCommand command)
+        {
+            command.Id = GetCurrentUserId();
+            await CommandDispatcher.DispatchAsync(command);
+
+            return Ok();
+        }
+
         private Guid GetCurrentUserId()
         {
             return new Guid(User.Identity.Name);
