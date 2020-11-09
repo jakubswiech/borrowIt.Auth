@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using BorrowIt.Auth.Application.DTOs;
 using BorrowIt.Auth.Domain.Users;
 using BorrowIt.Auth.Domain.Users.DataStructure;

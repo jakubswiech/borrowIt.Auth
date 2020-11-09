@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace BorrowIt.Auth
@@ -42,24 +43,21 @@ namespace BorrowIt.Auth
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllers();
             services.AddCors();
             services.AddSwaggerGen(ctx =>
             {
                 
-                var security = new Dictionary<string, IEnumerable<string>>
-                {
-                    {"Bearer", new string[] { }},
-                };
-
-                ctx.SwaggerDoc("v1", new Info() {Title = "BorrowIt.Auth", Version = "v1"});
+                var security = new OpenApiSecurityRequirement {{new OpenApiSecurityScheme() {Name = "Bearer"}, new string[] {}}};
+            
+                ctx.SwaggerDoc("v1", new OpenApiInfo() {Title = "BorrowIt.Auth", Version = "v1"});
                 
-                ctx.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                ctx.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
                     Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                     Name = "Authorization",
-                    In = "header",
-                    Type = "apiKey"
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
                 });
                 
                 ctx.AddSecurityRequirement(security);
@@ -117,8 +115,9 @@ namespace BorrowIt.Auth
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
+            app.UseRouting();
             app.UseCors(c =>
             {
                 c.AllowAnyHeader();
@@ -126,22 +125,15 @@ namespace BorrowIt.Auth
                 c.AllowAnyOrigin();
             });
             app.UseApiExceptionMiddleware();
-            if (env.IsDevelopment())
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-                });
-            }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Borrowit.Auth");
+            });
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts();
             app.UseAuthentication();
-            app.UseMvc();
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }
