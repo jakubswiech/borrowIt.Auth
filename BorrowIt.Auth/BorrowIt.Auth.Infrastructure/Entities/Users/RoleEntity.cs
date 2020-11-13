@@ -6,10 +6,8 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace BorrowIt.Auth.Infrastructure.Entities.Users
 {
     [MongoEntity("Roles")]
-    public class RoleEntity : IMongoEntity
+    public class RoleEntity : MongoEntity
     {
-        [BsonId]
-        public Guid Id { get; }
         public string Name { get; set; }
     }
 }

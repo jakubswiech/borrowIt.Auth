@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using BorrowIt.Auth.Application.Commands;
 using BorrowIt.Auth.Application.Queries;
@@ -20,13 +18,10 @@ using BorrowIt.Common.Mongo.Repositories;
 using BorrowIt.Common.Rabbit.IoC;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace BorrowIt.Auth
 {
@@ -38,10 +33,9 @@ namespace BorrowIt.Auth
         }
 
         public IConfiguration Configuration { get; }
-        public IContainer Container { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
             services.AddCors();
@@ -80,8 +74,10 @@ namespace BorrowIt.Auth
                         ValidateAudience = false
                     };
                 });
-            
-            var builder = new ContainerBuilder();
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
             builder.RegisterModule(new RawRabbitModule(Configuration));
             builder.RegisterModule(new MongoDbModule(Configuration, "mongoDb"));
             builder.RegisterAssemblyTypes(Assembly.GetEntryAssembly())
@@ -95,8 +91,8 @@ namespace BorrowIt.Auth
             builder.RegisterType<CommandDispatcher>().As<ICommandDispatcher>().InstancePerLifetimeScope();
             builder.Register(ctx =>
             {
-                var assemblies = new List<Assembly> {typeof(UsersMappingProfile).Assembly, typeof(CreateUserCommand).Assembly};
-                
+                var assemblies = new List<Assembly> { typeof(UsersMappingProfile).Assembly, typeof(CreateUserCommand).Assembly };
+
                 var mapperConfig = new MapperConfiguration(x =>
                     x.AddProfiles(assemblies));
 
@@ -105,17 +101,12 @@ namespace BorrowIt.Auth
             builder.RegisterType<QueryDispatcher>().As<IQueryDispatcher>().InstancePerLifetimeScope();
             builder.RegisterAssemblyTypes(typeof(SignInQuery).Assembly)
                 .AsClosedTypesOf(typeof(IQueryHandler<,>));
-            builder.Populate(services);
             builder.RegisterAssemblyTypes(typeof(IUserFactory).Assembly).Where(x => x.Name.EndsWith("Factory"))
                 .AsImplementedInterfaces();
-            Container = builder.Build();
-
-            return new AutofacServiceProvider(Container);
         }
 
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+            public void Configure(IApplicationBuilder app)
         {
             app.UseRouting();
             app.UseCors(c =>

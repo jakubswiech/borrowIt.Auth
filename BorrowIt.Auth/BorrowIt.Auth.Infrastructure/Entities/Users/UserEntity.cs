@@ -7,10 +7,8 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace BorrowIt.Auth.Infrastructure.Entities.Users
 {
     [MongoEntity("Users")]
-    public class UserEntity : IMongoEntity
+    public class UserEntity : MongoEntity
     {
-        [BsonId]
-        public Guid Id { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; }
