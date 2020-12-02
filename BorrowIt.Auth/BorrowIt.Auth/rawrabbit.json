@@ -17,5 +17,6 @@
     "Durable": true,
     "AutoDelete": true,
     "Type": "Topic"
-  }
+  },
+  "QueueNameSuffix": "Auth"
 }

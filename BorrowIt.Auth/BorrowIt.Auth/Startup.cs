@@ -27,6 +27,8 @@ namespace BorrowIt.Auth
 {
     public class Startup
     {
+        private const string CorsPolicyName = "corsPolicy";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -74,6 +76,16 @@ namespace BorrowIt.Auth
                         ValidateAudience = false
                     };
                 });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(CorsPolicyName,
+                    builder =>
+                    {
+                        // Not a permanent solution, but just trying to isolate the problem
+                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    });
+            });
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -109,12 +121,7 @@ namespace BorrowIt.Auth
             public void Configure(IApplicationBuilder app)
         {
             app.UseRouting();
-            app.UseCors(c =>
-            {
-                c.AllowAnyHeader();
-                c.AllowAnyMethod();
-                c.AllowAnyOrigin();
-            });
+            app.UseCors(CorsPolicyName);
             app.UseApiExceptionMiddleware();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
