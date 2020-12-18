@@ -35,7 +35,6 @@ namespace BorrowIt.Auth
                         throw;
                     }
                     failuresCount++;
-                    File.WriteAllText($"startError{failuresCount}.txt",e.ToString());
                     Thread.Sleep(30000);
                 }
             }

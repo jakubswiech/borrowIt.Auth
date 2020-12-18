@@ -5,10 +5,10 @@ WORKDIR /app
 COPY . ./
 
 # Copy csproj and restore as distinct layers
-RUN dotnet restore --configfile ./nuget.config ./BorrowIt.Auth/BorrowIt.Auth.csproj
-RUN dotnet restore --configfile ./nuget.config ./BorrowIt.Auth.Application/BorrowIt.Auth.Application.csproj
-RUN dotnet restore --configfile ./nuget.config ./BorrowIt.Auth.Domain/BorrowIt.Auth.Domain.csproj
-RUN dotnet restore --configfile ./nuget.config ./BorrowIt.Auth.Infrastructure/BorrowIt.Auth.Infrastructure.csproj
+RUN dotnet restore ./BorrowIt.Auth/BorrowIt.Auth.csproj
+RUN dotnet restore ./BorrowIt.Auth.Application/BorrowIt.Auth.Application.csproj
+RUN dotnet restore ./BorrowIt.Auth.Domain/BorrowIt.Auth.Domain.csproj
+RUN dotnet restore ./BorrowIt.Auth.Infrastructure/BorrowIt.Auth.Infrastructure.csproj
 RUN dotnet publish -c Release -o out
 
 # Build runtime image
